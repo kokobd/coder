@@ -15,6 +15,8 @@ data "coder_provisioner" "me" {
 data "coder_workspace" "me" {
 }
 
+data "aws_region" "current" {}
+
 
 data "coder_parameter" "dotfiles_uri" {
   name         = "dotfiles_uri"
@@ -89,11 +91,8 @@ resource "aws_ecs_service" "main" {
     expression = "attribute:coder.workspace_id == ${data.coder_workspace.me.id}"
   }
   task_definition = aws_ecs_task_definition.main.arn
-  network_configuration {
-    subnets         = [for subnet in data.aws_subnets.main.ids : subnet]
-    security_groups = [data.aws_security_group.main.id]
-  }
-  cluster = aws_ecs_cluster.main.arn
+  cluster         = aws_ecs_cluster.main.arn
+  depends_on      = [aws_cloudwatch_log_group.container]
 }
 
 resource "aws_ecs_cluster" "main" {
@@ -108,13 +107,36 @@ resource "aws_ecs_task_definition" "main" {
       image      = data.coder_parameter.docker_image.value
       essential  = true
       entryPoint = ["sh", "-c", coder_agent.main.init_script]
+      logConfiguration = {
+        logDriver = "awslogs",
+        options = {
+          "awslogs-group" : "${local.container_log_group_name}",
+          "awslogs-region" : "${data.aws_region.current.name}",
+          "awslogs-create-group" : "true",
+          "awslogs-stream-prefix" : "container"
+        }
+      }
+      environment = [
+        { name  = "CODER_AGENT_TOKEN",
+          value = "${coder_agent.main.token}"
+        }
+      ]
       # TODO add EFS volume
     }
   ])
-  network_mode             = "awsvpc"
+  network_mode             = "host"
   requires_compatibilities = ["EC2"]
   memory                   = data.coder_parameter.memory_gib.value * 1024 - 700
   # TODO add EFS volume
+}
+
+locals {
+  container_log_group_name = "/ecs/container/coder-${data.coder_workspace.me.id}"
+}
+
+resource "aws_cloudwatch_log_group" "container" {
+  name              = local.container_log_group_name
+  retention_in_days = 1
 }
 
 resource "aws_ec2_fleet" "main" {
