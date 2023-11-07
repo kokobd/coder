@@ -68,6 +68,17 @@ resource "coder_agent" "main" {
   EOT
 }
 
+resource "coder_metadata" "main" {
+  count       = data.coder_workspace.me.start_count
+  resource_id = aws_ecs_service.main.id
+
+  item {
+    key   = "image"
+    value = data.coder_parameter.docker_image.value
+  }
+}
+
+
 resource "aws_ecs_service" "main" {
   name                = "coder-${data.coder_workspace.me.id}"
   desired_count       = data.coder_workspace.me.start_count
@@ -93,15 +104,16 @@ resource "aws_ecs_task_definition" "main" {
   family = "coder-${data.coder_workspace.me.id}"
   container_definitions = jsonencode([
     {
-      name      = "main"
-      image     = data.coder_parameter.docker_image.value
-      essential = true
+      name       = "main"
+      image      = data.coder_parameter.docker_image.value
+      essential  = true
+      entryPoint = ["sh", "-c", coder_agent.main.init_script]
       # TODO add EFS volume
     }
   ])
   network_mode             = "awsvpc"
   requires_compatibilities = ["EC2"]
-  memory                   = data.coder_parameter.memory_gib.value * 1024
+  memory                   = data.coder_parameter.memory_gib.value * 1024 - 700
   # TODO add EFS volume
 }
 
@@ -160,7 +172,7 @@ resource "aws_launch_template" "main" {
 #!/bin/bash
     mkdir -p /etc/ecs
     echo 'ECS_CLUSTER=${aws_ecs_cluster.main.name}' >> /etc/ecs/ecs.config
-    echo 'ECS_INSTANCE_ATTRIBUTES={"coder.workspace_id":${data.coder_workspace.me.id}}' >> /etc/ecs/ecs.config
+    echo 'ECS_INSTANCE_ATTRIBUTES={"coder.workspace_id":"${data.coder_workspace.me.id}"}' >> /etc/ecs/ecs.config
   EOF
   )
   network_interfaces {
