@@ -35,6 +35,14 @@ data "coder_parameter" "docker_image" {
   mutable      = false
 }
 
+data "coder_parameter" "gitrepo_uri" {
+  name         = "gitrepo_uri"
+  display_name = "Git repository URI"
+  description  = "Git repository to clone on start"
+  type         = "string"
+  mutable      = false
+}
+
 data "coder_parameter" "dotfiles_uri" {
   name         = "dotfiles_uri"
   display_name = "dotfiles URI"
@@ -48,26 +56,41 @@ data "coder_parameter" "dotfiles_uri" {
   mutable      = true
 }
 
+data "coder_parameter" "dotfiles_branch" {
+  name         = "dotfiles_branch"
+  display_name = "dotfiles branch"
+  default      = "master"
+  type         = "string"
+  mutable      = true
+}
+
 resource "coder_agent" "main" {
-  arch                    = data.coder_provisioner.me.arch
-  os                      = "linux"
-  startup_script_timeout  = 180
-  env                     = { "DOTFILES_URI" = data.coder_parameter.dotfiles_uri.value != "" ? data.coder_parameter.dotfiles_uri.value : null }
+  arch                   = data.coder_provisioner.me.arch
+  os                     = "linux"
+  startup_script_timeout = 180
+  env = {
+    "DOTFILES_URI" = data.coder_parameter.dotfiles_uri.value != "" ? data.coder_parameter.dotfiles_uri.value : null,
+    "GITREPO_URI"  = data.coder_parameter.gitrepo_uri.value
+  }
   dir                     = "/workspace"
   startup_script_behavior = "blocking"
   startup_script          = <<-EOT
-    set -e
-    if [ -n "$DOTFILES_URI" ]; then
-      echo "Installing dotfiles from $DOTFILES_URI"
-      coder dotfiles -y "$DOTFILES_URI"
-    fi
     if [ -d /workspace ]; then
       sudo chown -R coder:coder /workspace
+    fi
+    mkdir -p ~/.ssh
+    echo "github.com ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOMqqnkVzrm0SdG6UOoqKLsabgH5C9okWi0dh2l9GKJl" > ~/.ssh/known_hosts
+    if [ ! -z "$GITREPO_URI" -a -z "$(ls -A /workspace)" ]; then
+      git clone "$GITREPO_URI" /workspace
+    fi
+    if [ -n "$DOTFILES_URI" ]; then
+      echo "Installing dotfiles from $DOTFILES_URI"
+      coder dotfiles -y "$DOTFILES_URI" --branch "${data.coder_parameter.dotfiles_branch.value}"
     fi
   EOT
 }
 
-resource "docker_volume" "work_volume" {
+resource "docker_volume" "workspace" {
   name = "coder-${data.coder_workspace.me.id}-home"
   # Protect the volume from being deleted due to changes in attributes.
   lifecycle {
@@ -111,7 +134,7 @@ resource "docker_container" "workspace" {
   }
   volumes {
     container_path = "/workspace"
-    volume_name    = docker_volume.work_volume.name
+    volume_name    = docker_volume.workspace.name
     read_only      = false
   }
   # Add labels in Docker to keep track of orphan resources.
