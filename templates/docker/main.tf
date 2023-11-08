@@ -137,6 +137,8 @@ resource "docker_container" "workspace" {
     volume_name    = docker_volume.workspace.name
     read_only      = false
   }
+  network_mode = "bridge"
+  dns          = ["172.17.0.1"]
   # Add labels in Docker to keep track of orphan resources.
   labels {
     label = "coder.owner"
