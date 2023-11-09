@@ -17,27 +17,6 @@ data "coder_workspace" "me" {
 
 data "aws_region" "current" {}
 
-
-data "coder_parameter" "dotfiles_uri" {
-  name         = "dotfiles_uri"
-  display_name = "dotfiles URI"
-  description  = <<-EOF
-  Dotfiles repo URI (optional)
-
-  see https://dotfiles.github.io
-  EOF
-  default      = "https://github.com/${data.coder_workspace.me.owner}/dotfiles"
-  type         = "string"
-  mutable      = true
-}
-
-
-data "coder_parameter" "docker_image" {
-  name         = "docker_image"
-  display_name = "Docker image"
-  default      = "zelinf/coder-nix:latest"
-}
-
 data "coder_parameter" "cpu_count" {
   name         = "cpu_count"
   display_name = "CPU count"
@@ -52,36 +31,17 @@ data "coder_parameter" "memory_gib" {
   default      = 8
 }
 
-resource "coder_agent" "main" {
-  arch                    = data.coder_provisioner.me.arch
-  os                      = "linux"
-  startup_script_timeout  = 180
-  env                     = { "DOTFILES_URI" = data.coder_parameter.dotfiles_uri.value != "" ? data.coder_parameter.dotfiles_uri.value : null }
-  dir                     = "/workspace"
-  startup_script_behavior = "blocking"
-  startup_script          = <<-EOT
-    set -e
-    if [ -n "$DOTFILES_URI" ]; then
-      echo "Installing dotfiles from $DOTFILES_URI"
-      coder dotfiles -y "$DOTFILES_URI"
-    fi
-    mkdir -p /workspace
-    sudo chown -R coder:coder /workspace
-  EOT
-}
+module "common" {
+  source = "./modules/common"
 
-resource "coder_metadata" "main" {
-  count       = data.coder_workspace.me.start_count
-  resource_id = aws_ecs_service.main.id
-
-  item {
-    key   = "image"
-    value = data.coder_parameter.docker_image.value
-  }
+  coder_provisioner  = data.coder_provisioner.me
+  coder_workspace    = data.coder_workspace.me
+  container_resource = aws_ecs_service.main
 }
 
 
 resource "aws_ecs_service" "main" {
+  count               = 1
   name                = "coder-${data.coder_workspace.me.id}"
   desired_count       = data.coder_workspace.me.start_count
   launch_type         = "EC2"
@@ -104,9 +64,9 @@ resource "aws_ecs_task_definition" "main" {
   container_definitions = jsonencode([
     {
       name       = "main"
-      image      = data.coder_parameter.docker_image.value
+      image      = module.common.docker_image
       essential  = true
-      entryPoint = ["sh", "-c", coder_agent.main.init_script]
+      entryPoint = ["sh", "-c", module.common.container_init_script]
       logConfiguration = {
         logDriver = "awslogs",
         options = {
@@ -118,7 +78,7 @@ resource "aws_ecs_task_definition" "main" {
       }
       environment = [
         { name  = "CODER_AGENT_TOKEN",
-          value = "${coder_agent.main.token}"
+          value = module.common.coder_agent_token
         }
       ]
       # TODO add EFS volume

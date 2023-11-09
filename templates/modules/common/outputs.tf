@@ -1,5 +1,5 @@
 
-output "container_startup_script" {
+output "container_init_script" {
   description = "Startup script to run in the container"
   value       = coder_agent.main.init_script
 }
