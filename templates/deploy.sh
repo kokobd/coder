@@ -2,9 +2,12 @@
 
 set -e
 
+NAME=$1
+
 cd "$(dirname "$0")"
 
 rm -rf temp
-cp -rL docker temp
+cp -rL $NAME temp
 cd temp
-coder templates push docker -y
+coder templates push $NAME -y
+rm -rf temp
