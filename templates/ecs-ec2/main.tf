@@ -41,9 +41,9 @@ module "common" {
 
 
 resource "aws_ecs_service" "main" {
-  count               = 1
+  count               = data.coder_workspace.me.start_count
   name                = "coder-${data.coder_workspace.me.id}"
-  desired_count       = data.coder_workspace.me.start_count
+  desired_count       = 1
   launch_type         = "EC2"
   scheduling_strategy = "DAEMON"
   placement_constraints {
@@ -110,9 +110,18 @@ resource "aws_efs_file_system" "workspace" {
   }
   throughput_mode = "bursting"
   lifecycle_policy {
-    transition_to_ia                    = "AFTER_7_DAYS"
+    transition_to_ia = "AFTER_7_DAYS"
+  }
+  lifecycle_policy {
     transition_to_primary_storage_class = "AFTER_1_ACCESS"
   }
+}
+
+resource "aws_efs_mount_target" "workspace" {
+  for_each        = toset(data.aws_subnets.main.ids)
+  file_system_id  = aws_efs_file_system.workspace.id
+  subnet_id       = each.key
+  security_groups = [data.aws_security_group.main.id]
 }
 
 locals {
