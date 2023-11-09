@@ -38,10 +38,10 @@ data "coder_parameter" "dotfiles_branch" {
   mutable      = true
 }
 
-data "coder_parameter" "gitrepo_uri" {
-  name         = "gitrepo_uri"
-  display_name = "Git repository URI"
-  description  = "Git repository to clone on start"
+data "coder_parameter" "github_repo" {
+  name         = "github_repo"
+  display_name = "GitHub repository"
+  description  = "Owner and repository name, for example octocat/Hello-World"
   type         = "string"
   default      = ""
   mutable      = false
@@ -52,9 +52,9 @@ resource "coder_agent" "main" {
   os                     = "linux"
   startup_script_timeout = 180
   env = {
-    DOTFILES_URI = data.coder_parameter.dotfiles_uri.value != "" ? data.coder_parameter.dotfiles_uri.value : null,
-    GITREPO_URI  = data.coder_parameter.gitrepo_uri.value
-    LC_ALL       = "C.utf8"
+    DOTFILES_URI      = data.coder_parameter.dotfiles_uri.value != "" ? data.coder_parameter.dotfiles_uri.value : null,
+    GITHUB_REPOSITORY = data.coder_parameter.github_repo.value
+    LC_ALL            = "C.utf8"
   }
   dir                     = "/workspace"
   startup_script_behavior = "blocking"
@@ -64,8 +64,8 @@ resource "coder_agent" "main" {
     fi
     mkdir -p ~/.ssh
     echo "github.com ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOMqqnkVzrm0SdG6UOoqKLsabgH5C9okWi0dh2l9GKJl" > ~/.ssh/known_hosts
-    if [ ! -z "$GITREPO_URI" -a -z "$(ls -A /workspace)" ]; then
-      git clone "$GITREPO_URI" /workspace
+    if [ ! -z "$GITHUB_REPOSITORY" -a -z "$(ls -A /workspace)" ]; then
+      git clone "$GITHUB_REPOSITORY" /workspace
     fi
     if [ -n "$DOTFILES_URI" ]; then
       echo "Installing dotfiles from $DOTFILES_URI"
