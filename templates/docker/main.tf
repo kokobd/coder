@@ -69,8 +69,9 @@ resource "coder_agent" "main" {
   os                     = "linux"
   startup_script_timeout = 180
   env = {
-    "DOTFILES_URI" = data.coder_parameter.dotfiles_uri.value != "" ? data.coder_parameter.dotfiles_uri.value : null,
-    "GITREPO_URI"  = data.coder_parameter.gitrepo_uri.value
+    DOTFILES_URI = data.coder_parameter.dotfiles_uri.value != "" ? data.coder_parameter.dotfiles_uri.value : null,
+    GITREPO_URI  = data.coder_parameter.gitrepo_uri.value
+    LC_ALL       = "C.utf8"
   }
   dir                     = "/workspace"
   startup_script_behavior = "blocking"
