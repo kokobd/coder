@@ -41,6 +41,13 @@ resource "docker_volume" "workspace" {
   }
 }
 
+resource "docker_volume" "nix_store" {
+  name = "coder-${data.coder_workspace.me.id}-nix-store"
+  lifecycle {
+    ignore_changes = all
+  }
+}
+
 resource "docker_container" "workspace" {
   count = data.coder_workspace.me.start_count
   image = module.common.docker_image
@@ -59,6 +66,11 @@ resource "docker_container" "workspace" {
   volumes {
     container_path = "/workspace"
     volume_name    = docker_volume.workspace.name
+    read_only      = false
+  }
+  volumes {
+    container_path = "/nix"
+    volume_name    = docker_volume.nix_store.name
     read_only      = false
   }
   network_mode = "bridge"
