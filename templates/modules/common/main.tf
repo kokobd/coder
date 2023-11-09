@@ -24,7 +24,7 @@ data "coder_parameter" "dotfiles_uri" {
 
   see https://dotfiles.github.io
   EOF
-  default      = "https://github.com/${var.coder_workspace.owner}/dotfiles"
+  default      = "git@github.com:kokobd/dotfiles.git"
   type         = "string"
   mutable      = true
   order        = 2
@@ -33,7 +33,7 @@ data "coder_parameter" "dotfiles_uri" {
 data "coder_parameter" "dotfiles_branch" {
   name         = "dotfiles_branch"
   display_name = "dotfiles branch"
-  default      = "master"
+  default      = "main"
   type         = "string"
   mutable      = true
 }

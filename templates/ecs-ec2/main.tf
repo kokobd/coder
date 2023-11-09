@@ -81,13 +81,38 @@ resource "aws_ecs_task_definition" "main" {
           value = module.common.coder_agent_token
         }
       ]
-      # TODO add EFS volume
+      mountPoints = [
+        {
+          sourceVolume  = "workspace",
+          containerPath = "/workspace"
+        }
+      ]
     }
   ])
   network_mode             = "host"
   requires_compatibilities = ["EC2"]
   memory                   = data.coder_parameter.memory_gib.value * 1024 - 700
-  # TODO add EFS volume
+  volume {
+    name = "workspace"
+    efs_volume_configuration {
+      file_system_id = aws_efs_file_system.workspace.id
+      root_directory = "/"
+    }
+  }
+}
+
+resource "aws_efs_file_system" "workspace" {
+  tags = {
+    Name = "coder-${data.coder_workspace.me.id}-workspace"
+  }
+  lifecycle {
+    ignore_changes = all
+  }
+  throughput_mode = "bursting"
+  lifecycle_policy {
+    transition_to_ia                    = "AFTER_7_DAYS"
+    transition_to_primary_storage_class = "AFTER_1_ACCESS"
+  }
 }
 
 locals {
