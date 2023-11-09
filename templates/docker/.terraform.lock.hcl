@@ -5,6 +5,7 @@ provider "registry.terraform.io/coder/coder" {
   version = "0.12.2"
   hashes = [
     "h1:hulhLnq4kY8RaZ6EusWj08UbCYUhL0bq996BIzl7lYo=",
+    "h1:rHLMydEHDdfcVIuyXOuK684aOWCaeE+D6fnlBbw5q1M=",
     "zh:060e97e5c64473065c409741c97aefa237c41000fa5c5913407b7bb1c60b6610",
     "zh:1d8f65795daf6f90902cc7ce1667ba0655782bbd3f333112b18ddaf054dcd725",
     "zh:629a0e3cb775c6bb94537566e49a58ef596477e1347fe698dc639ed5698c11fe",
@@ -26,6 +27,7 @@ provider "registry.terraform.io/coder/coder" {
 provider "registry.terraform.io/kreuzwerker/docker" {
   version = "3.0.2"
   hashes = [
+    "h1:XjdpVL61KtTsuPE8swok3GY8A+Bu3TZs8T2DOEpyiXo=",
     "h1:cT2ccWOtlfKYBUE60/v2/4Q6Stk1KYTNnhxSck+VPlU=",
     "zh:15b0a2b2b563d8d40f62f83057d91acb02cd0096f207488d8b4298a59203d64f",
     "zh:23d919de139f7cd5ebfd2ff1b94e6d9913f0977fcfc2ca02e1573be53e269f95",
