@@ -14,6 +14,7 @@ data "coder_parameter" "docker_image" {
   icon         = "/icon/docker.png"
   type         = "string"
   mutable      = true
+  order        = 1
   option {
     name  = "nix"
     value = "zelinf/coder-nix:latest"
@@ -22,7 +23,10 @@ data "coder_parameter" "docker_image" {
     name  = "ghcup"
     value = "zelinf/coder-ghcup:latest"
   }
-  order = 1
+  option {
+    name  = "rust"
+    value = "zelinf/coder-rust:latest"
+  }
 }
 
 data "coder_parameter" "dotfiles_uri" {
@@ -91,5 +95,9 @@ resource "coder_metadata" "container_info" {
   item {
     key   = "image"
     value = data.coder_parameter.docker_image.value
+  }
+  item {
+    key   = "GitHub Repo"
+    value = data.coder_parameter.github_repo.value
   }
 }
