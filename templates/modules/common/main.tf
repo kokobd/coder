@@ -8,17 +8,26 @@ terraform {
 
 data "coder_parameter" "docker_image" {
   name         = "docker_image"
-  display_name = "Docker image"
-  description  = "The Docker image will be used to build your workspace."
+  display_name = "Environment"
+  description  = "Base environment to use for your workspace"
   default      = "zelinf/coder-nix:latest"
   icon         = "/icon/docker.png"
   type         = "string"
-  mutable      = false
+  mutable      = true
+  option {
+    name  = "nix"
+    value = "zelinf/coder-nix:latest"
+  }
+  option {
+    name  = "ghcup"
+    value = "zelinf/coder-ghcup:latest"
+  }
+  order = 1
 }
 
 data "coder_parameter" "dotfiles_uri" {
   name         = "dotfiles_uri"
-  display_name = "dotfiles URI"
+  display_name = "Dotfiles URI"
   description  = <<-EOF
   Dotfiles repo URI (optional)
 
@@ -32,10 +41,11 @@ data "coder_parameter" "dotfiles_uri" {
 
 data "coder_parameter" "dotfiles_branch" {
   name         = "dotfiles_branch"
-  display_name = "dotfiles branch"
+  display_name = "Dotfiles branch"
   default      = "main"
   type         = "string"
   mutable      = true
+  order        = 3
 }
 
 data "coder_parameter" "github_repo" {

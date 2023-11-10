@@ -1,10 +1,3 @@
-# Note: this example demonstrates the use of
-# dotfiles with Coder templates.
-
-# The Docker aspect of the template only works
-# with macOS/Linux amd64 systems. See the full
-# Docker example for details
-
 terraform {
   required_providers {
     coder = {
