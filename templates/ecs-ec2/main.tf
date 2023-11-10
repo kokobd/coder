@@ -22,6 +22,7 @@ data "coder_parameter" "cpu_count" {
   display_name = "CPU count"
   type         = "number"
   default      = 2
+  mutable      = true
 }
 
 data "coder_parameter" "memory_gib" {
@@ -29,6 +30,7 @@ data "coder_parameter" "memory_gib" {
   display_name = "Memory in GiB"
   type         = "number"
   default      = 8
+  mutable      = true
 }
 
 module "common" {
