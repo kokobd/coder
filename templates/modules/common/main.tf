@@ -70,7 +70,7 @@ resource "coder_agent" "main" {
     GITHUB_REPOSITORY = data.coder_parameter.github_repo.value
     LC_ALL            = "C.utf8"
   }
-  dir                     = "/workspace"
+  dir                     = "/workspace/${basename(data.coder_parameter.github_repo.value)}"
   startup_script_behavior = "blocking"
   startup_script          = <<-EOT
     if [ -d /workspace ]; then
@@ -79,7 +79,7 @@ resource "coder_agent" "main" {
     mkdir -p ~/.ssh
     echo "github.com ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOMqqnkVzrm0SdG6UOoqKLsabgH5C9okWi0dh2l9GKJl" > ~/.ssh/known_hosts
     if [ ! -z "$GITHUB_REPOSITORY" -a -z "$(ls -A /workspace)" ]; then
-      git clone "git@github.com:$GITHUB_REPOSITORY.git" /workspace
+      git clone "git@github.com:$GITHUB_REPOSITORY.git" /workspace/$(basename "$GITHUB_REPOSITORY")
     fi
     if [ -n "$DOTFILES_URI" ]; then
       echo "Installing dotfiles from $DOTFILES_URI"
