@@ -1,7 +1,6 @@
 RUN apt-get install -y build-essential curl libffi-dev libffi7 libgmp-dev libgmp10 \
   libncurses-dev libncurses5 libtinfo5 zlib1g-dev
 USER coder
-ENV XDG_CONFIG_HOME=/workspace/.config XDG_CACHE_HOME=/workspace/.cache XDG_STATE_HOME=/workspace/.state
 RUN curl --proto '=https' --tlsv1.2 -sSf https://get-ghcup.haskell.org | BOOTSTRAP_HASKELL_NONINTERACTIVE=1 BOOTSTRAP_HASKELL_MINIMAL=1 sh && \
   echo 'source $HOME/.ghcup/env' >> /home/coder/.bashrc && \
   . /home/coder/.ghcup/env && \
@@ -10,3 +9,4 @@ RUN curl --proto '=https' --tlsv1.2 -sSf https://get-ghcup.haskell.org | BOOTSTR
   ghcup install cabal 3.10.1.0 --set && \
   ghcup install stack --set && \
   cabal update
+ENV XDG_CONFIG_HOME=/workspace/.config XDG_CACHE_HOME=/workspace/.cache XDG_STATE_HOME=/workspace/.state
