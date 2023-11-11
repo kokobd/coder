@@ -54,8 +54,10 @@ resource "docker_container" "workspace" {
     volume_name    = docker_volume.workspace.name
     read_only      = false
   }
-  network_mode = "bridge"
-  dns          = ["172.17.0.1"]
+  networks_advanced {
+    name = docker_network.bridge.id
+  }
+  dns = ["172.17.0.1"]
   # Add labels in Docker to keep track of orphan resources.
   labels {
     label = "coder.owner"
@@ -73,4 +75,12 @@ resource "docker_container" "workspace" {
     label = "coder.workspace_name"
     value = data.coder_workspace.me.name
   }
+}
+
+resource "docker_network" "bridge" {
+  name       = "coder-${data.coder_workspace.me.id}-bridge"
+  attachable = true
+  driver     = "bridge"
+  internal   = false
+  ipv6       = false
 }
