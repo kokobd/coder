@@ -1,0 +1,86 @@
+cabal-version: 3.4
+name:          tool
+version:       0.1.0.0
+synopsis:      tool for my coder deployment
+
+-- description:
+homepage:      https://github.com/kokobd/coder
+license:       BSD-3-Clause
+license-file:  LICENSE
+author:        kokobd
+maintainer:    contact@zelinf.net
+
+-- copyright:
+category:      Web
+build-type:    Simple
+
+-- extra-source-files:
+
+common opts
+  ghc-options:        -Wall
+  default-extensions:
+    DeriveAnyClass
+    DerivingStrategies
+    DuplicateRecordFields
+    NoFieldSelectors
+    NoImplicitPrelude
+    OverloadedLabels
+    OverloadedStrings
+
+  build-depends:
+    , aeson
+    , base
+    , bytestring
+    , containers
+    , directory
+    , filepath
+    , generic-lens
+    , lens
+    , mtl
+    , optparse-applicative
+    , relude
+    , string-interpolate
+    , text
+    , transformers
+    , yaml
+
+library
+  import:           opts
+
+  -- cabal-fmt: expand src
+  exposed-modules:
+    Coder.Tool
+    Coder.Tool.Generate
+    Coder.Tool.Generate.Docker
+
+  hs-source-dirs:   src
+  default-language: GHC2021
+
+executable tool
+  import:           opts
+  main-is:          Main.hs
+
+  -- other-modules:
+  -- other-extensions:
+  build-depends:    tool
+  hs-source-dirs:   exe
+  default-language: GHC2021
+
+test-suite spec
+  import:             opts
+  default-language:   GHC2021
+
+  -- other-modules:
+  -- other-extensions:
+  type:               exitcode-stdio-1.0
+  hs-source-dirs:     test
+  main-is:            Main.hs
+
+  -- cabal-fmt: expand test -Main
+  other-modules:      Coder.Tool.Generate.DockerSpec
+  build-depends:
+    , tasty
+    , tasty-hunit
+    , tool
+
+  build-tool-depends: tasty-discover:tasty-discover
