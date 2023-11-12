@@ -1,3 +1,5 @@
+{-# LANGUAGE QuasiQuotes #-}
+
 module Coder.Tool.Generate.Docker
   ( readFromYamlDir,
     ImageAlias (..),
@@ -5,14 +7,16 @@ module Coder.Tool.Generate.Docker
     Dockerfile' (..),
     renderDockerfiles,
     writeRenderedDockerfiles,
+    generateGitHubWorkflow,
   )
 where
 
 import Control.Exception (throwIO)
-import Control.Lens (view)
+import Control.Lens (view, (^.))
 import Data.Aeson (FromJSON, ToJSON)
 import Data.Generics.Labels ()
 import Data.Map.Strict qualified as Map
+import Data.String.Interpolate (__i)
 import Data.Traversable (for)
 import Data.Yaml qualified as Yaml
 import Relude
@@ -94,3 +98,50 @@ writeRenderedDockerfiles destDir aliasToContent =
       $ "# This file was generated, please modify the yml files instead"
       <> "\n"
       <> content
+
+generateGitHubWorkflow :: [ImageAlias] -> Text
+generateGitHubWorkflow aliases =
+  [__i|
+    name: Build docker images and push to Docker Hub
+
+    on:
+      push:
+        branches:
+          - "main"
+        paths:
+          - "containers/**"
+    
+    jobs:
+  |]
+    <> "\n"
+    <> foldMap
+      ( \alias ->
+          let t = alias ^. #_ImageAlias
+           in addIndentation
+                [__i|
+                  #{t}:
+                    runs-on: ubuntu-latest
+                    steps:
+                      - uses: actions/checkout@v2
+                      - name: Set up Docker Buildx
+                        uses: docker/setup-buildx-action@v3
+                      - name: Login to Docker Hub
+                        uses: docker/login-action@v3
+                        with:
+                          username: ${{ vars.DOCKERHUB_USERNAME }}
+                          password: ${{ secrets.DOCKERHUB_TOKEN }}
+                      - run: |
+                          ./containers/generate_dockerfile.sh #{t}
+                      - name: Build and push coder-#{t}
+                        uses: docker/build-push-action@v5
+                        with:
+                          context: ./containers
+                          file: containers/Dockerfile.#{t}.full
+                          push: true
+                          tags: zelinf/coder-#{t}:latest
+                |]
+      )
+      aliases
+
+addIndentation :: Text -> Text
+addIndentation = unlines . fmap ("  " <>) . lines

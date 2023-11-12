@@ -3,3 +3,5 @@
 temp/
 .vscode/
 .envrc
+cabal.project.local
+dist-newstyle/

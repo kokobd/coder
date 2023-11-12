@@ -39,6 +39,7 @@ common opts
     , mtl
     , optparse-applicative
     , relude
+    , string-interpolate
     , text
     , transformers
     , yaml
