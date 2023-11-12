@@ -38,7 +38,7 @@ data "coder_parameter" "memory_gib" {
 data "coder_parameter" "disk_size_gib" {
   name         = "disk_size_gib"
   display_name = "Disk size in GiB"
-  type         = number
+  type         = "number"
   default      = 60
   mutable      = false
 }
@@ -178,7 +178,7 @@ resource "aws_launch_template" "main" {
       delete_on_termination = true
       iops                  = 3000
       throughput            = 125
-      volume_size           = data.coder_parameter.disk_size_gib
+      volume_size           = data.coder_parameter.disk_size_gib.value
       volume_type           = "gp3"
     }
   }
