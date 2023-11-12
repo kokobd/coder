@@ -76,6 +76,7 @@ resource "coder_agent" "main" {
     if [ -d /workspace ]; then
       sudo chown -R coder:coder /workspace
     fi
+    echo 'PATH=/workspace/.bin:$PATH' >> ~/.bashrc
     mkdir -p ~/.ssh
     echo "github.com ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOMqqnkVzrm0SdG6UOoqKLsabgH5C9okWi0dh2l9GKJl" > ~/.ssh/known_hosts
     if [ ! -z "$GITHUB_REPOSITORY" -a -z "$(ls -A /workspace)" ]; then
