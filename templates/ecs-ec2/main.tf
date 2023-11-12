@@ -24,7 +24,7 @@ data "coder_parameter" "cpu_count" {
   default      = 2
   # EC2 fleet won't immediately use new launch template, set this as immutable for now.
   # We should find a way to update instance immediately and being able to set this as mutable.
-  mutable      = false
+  mutable = false
 }
 
 data "coder_parameter" "memory_gib" {
@@ -46,9 +46,10 @@ data "coder_parameter" "disk_size_gib" {
 module "common" {
   source = "./modules/common"
 
-  coder_provisioner  = data.coder_provisioner.me
-  coder_workspace    = data.coder_workspace.me
-  container_resource = aws_ecs_service.main
+  coder_provisioner   = data.coder_provisioner.me
+  coder_workspace     = data.coder_workspace.me
+  container_resource  = aws_ecs_service.main
+  coder_template_name = "ecs-ec2"
 }
 
 

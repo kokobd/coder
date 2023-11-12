@@ -69,6 +69,7 @@ resource "coder_agent" "main" {
     DOTFILES_URI      = data.coder_parameter.dotfiles_uri.value != "" ? data.coder_parameter.dotfiles_uri.value : null,
     GITHUB_REPOSITORY = data.coder_parameter.github_repo.value
     LC_ALL            = "C.utf8"
+    CODER_TEMPLATE    = var.coder_template_name
   }
   dir                     = "/workspace/${basename(data.coder_parameter.github_repo.value)}"
   startup_script_behavior = "blocking"

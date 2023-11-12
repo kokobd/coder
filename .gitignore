@@ -5,3 +5,4 @@ temp/
 .envrc
 cabal.project.local
 dist-newstyle/
+.direnv/
