@@ -109,7 +109,8 @@ generateGitHubWorkflow aliases =
         branches:
           - "main"
         paths:
-          - "containers/**"
+          - "dockerfiles/**"
+          - ".github/workflows/image.yml"
     
     jobs:
   |]
@@ -130,13 +131,11 @@ generateGitHubWorkflow aliases =
                         with:
                           username: ${{ vars.DOCKERHUB_USERNAME }}
                           password: ${{ secrets.DOCKERHUB_TOKEN }}
-                      - run: |
-                          ./containers/generate_dockerfile.sh #{t}
                       - name: Build and push coder-#{t}
                         uses: docker/build-push-action@v5
                         with:
-                          context: ./containers
-                          file: containers/Dockerfile.#{t}.full
+                          context: ./dockerfiles
+                          file: dockerfiles/Dockerfile.#{t}
                           push: true
                           tags: zelinf/coder-#{t}:latest
                 |]

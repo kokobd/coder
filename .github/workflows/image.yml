@@ -5,7 +5,8 @@ on:
     branches:
       - "main"
     paths:
-      - "containers/**"
+      - "dockerfiles/**"
+      - ".github/workflows/image.yml"
 
 jobs:
   base:
@@ -19,13 +20,11 @@ jobs:
         with:
           username: ${{ vars.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
-      - run: |
-          ./containers/generate_dockerfile.sh base
       - name: Build and push coder-base
         uses: docker/build-push-action@v5
         with:
-          context: ./containers
-          file: containers/Dockerfile.base.full
+          context: ./dockerfiles
+          file: dockerfiles/Dockerfile.base
           push: true
           tags: zelinf/coder-base:latest
   ghcup:
@@ -39,13 +38,11 @@ jobs:
         with:
           username: ${{ vars.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
-      - run: |
-          ./containers/generate_dockerfile.sh ghcup
       - name: Build and push coder-ghcup
         uses: docker/build-push-action@v5
         with:
-          context: ./containers
-          file: containers/Dockerfile.ghcup.full
+          context: ./dockerfiles
+          file: dockerfiles/Dockerfile.ghcup
           push: true
           tags: zelinf/coder-ghcup:latest
   nix:
@@ -59,13 +56,11 @@ jobs:
         with:
           username: ${{ vars.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
-      - run: |
-          ./containers/generate_dockerfile.sh nix
       - name: Build and push coder-nix
         uses: docker/build-push-action@v5
         with:
-          context: ./containers
-          file: containers/Dockerfile.nix.full
+          context: ./dockerfiles
+          file: dockerfiles/Dockerfile.nix
           push: true
           tags: zelinf/coder-nix:latest
   rust:
@@ -79,12 +74,10 @@ jobs:
         with:
           username: ${{ vars.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
-      - run: |
-          ./containers/generate_dockerfile.sh rust
       - name: Build and push coder-rust
         uses: docker/build-push-action@v5
         with:
-          context: ./containers
-          file: containers/Dockerfile.rust.full
+          context: ./dockerfiles
+          file: dockerfiles/Dockerfile.rust
           push: true
           tags: zelinf/coder-rust:latest
