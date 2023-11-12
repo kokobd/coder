@@ -54,7 +54,7 @@ resource "aws_ecs_service" "main" {
   }
   task_definition = aws_ecs_task_definition.main.arn
   cluster         = aws_ecs_cluster.main.arn
-  depends_on      = [aws_cloudwatch_log_group.container]
+  depends_on      = [aws_cloudwatch_log_group.container, aws_efs_mount_target.workspace]
 }
 
 resource "aws_ecs_cluster" "main" {
@@ -209,9 +209,7 @@ resource "aws_iam_instance_profile" "main" {
 }
 
 data "aws_security_group" "main" {
-  tags = {
-    coder = "true"
-  }
+  id = var.security_group_id
 }
 
 data "aws_subnets" "main" {

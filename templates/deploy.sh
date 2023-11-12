@@ -9,5 +9,8 @@ cd "$(dirname "$0")"
 rm -rf temp
 cp -rL $NAME temp
 cd temp
-coder templates push $NAME -y
+if [ ! -f vars.yml ]; then
+  touch vars.yml
+fi
+coder templates push $NAME -y --variables-file="vars.yml"
 rm -rf temp
