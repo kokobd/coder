@@ -1,0 +1,33 @@
+# This file was generated, please modify the yml files instead
+FROM docker.io/ubuntu:22.04
+
+# Install essential tools
+RUN apt-get update -y && \
+  apt-get install -y \
+    sudo vim build-essential curl man less git screen gpg iputils-ping net-tools
+RUN yes | unminimize
+
+# Creat user
+RUN groupadd coder && \
+  useradd --system --create-home \
+  --home-dir /home/coder \
+  --shell /bin/bash \
+  --gid coder --groups sudo --uid 1000 \
+  --password '$1$AxoJEpZ5$QMu6Z6jrv9BKa2und77o90' \
+  coder && \
+  echo '%coder         ALL = (ALL) NOPASSWD: ALL' >> /etc/sudoers
+
+# Prepare /workspace dir. Used only when /workspace is not mounted.
+RUN mkdir -p /workspace
+RUN apt-get install -y build-essential curl libffi-dev libffi7 libgmp-dev libgmp10 \
+  libncurses-dev libncurses5 libtinfo5 zlib1g-dev
+USER coder
+RUN curl --proto '=https' --tlsv1.2 -sSf https://get-ghcup.haskell.org | BOOTSTRAP_HASKELL_NONINTERACTIVE=1 BOOTSTRAP_HASKELL_MINIMAL=1 sh && \
+  echo 'source $HOME/.ghcup/env' >> /home/coder/.bashrc && \
+  . /home/coder/.ghcup/env && \
+  ghcup install ghc 9.4.7 --set && \
+  ghcup install hls --set && \
+  ghcup install cabal 3.10.1.0 --set && \
+  ghcup install stack --set && \
+  cabal update
+ENV XDG_CONFIG_HOME=/workspace/.config XDG_CACHE_HOME=/workspace/.cache XDG_STATE_HOME=/workspace/.state

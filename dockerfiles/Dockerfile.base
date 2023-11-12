@@ -1,16 +1,4 @@
-#!/usr/bin/env bash
-
-set -e
-
-NAME=$1
-
-cd "$(dirname "$0")"
-
-FILENAME="Dockerfile.$NAME"
-GENERATED_FILENAME="Dockerfile.$NAME.full"
-
-rm -f "$GENERATED_FILENAME"
-cat > "$GENERATED_FILENAME" <<EOF
+# This file was generated, please modify the yml files instead
 FROM docker.io/ubuntu:22.04
 
 # Install essential tools
@@ -31,6 +19,3 @@ RUN groupadd coder && \
 
 # Prepare /workspace dir. Used only when /workspace is not mounted.
 RUN mkdir -p /workspace
-EOF
-
-cat >> "$GENERATED_FILENAME" < "$FILENAME"
