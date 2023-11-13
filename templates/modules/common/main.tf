@@ -70,10 +70,12 @@ resource "coder_agent" "main" {
     GITHUB_REPOSITORY = data.coder_parameter.github_repo.value
     LC_ALL            = "C.utf8"
     CODER_TEMPLATE    = var.coder_template_name
-    XDG_CONFIG_HOME   = "/workspace/.config"
-    XDG_CACHE_HOME    = "/workspace/.cache"
-    XDG_STATE_HOME    = "/workspace/.state"
-    STACK_XDG         = "true"
+
+    # Redirect build cache of common compilers to /workspace
+    XDG_CONFIG_HOME = "/workspace/.config"
+    XDG_CACHE_HOME  = "/workspace/.cache"
+    XDG_STATE_HOME  = "/workspace/.state"
+    STACK_ROOT      = "/workspace/.stack"
   }
   dir                     = "/workspace/${basename(data.coder_parameter.github_repo.value)}"
   startup_script_behavior = "blocking"
