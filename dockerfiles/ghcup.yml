@@ -11,4 +11,4 @@ content: |
     ghcup install cabal 3.10.1.0 --set && \
     ghcup install stack --set && \
     cabal update
-  ENV XDG_CONFIG_HOME=/workspace/.config XDG_CACHE_HOME=/workspace/.cache XDG_STATE_HOME=/workspace/.state
+  ENV 
