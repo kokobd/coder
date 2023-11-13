@@ -11,4 +11,3 @@ content: |
     ghcup install cabal 3.10.1.0 --set && \
     ghcup install stack --set && \
     cabal update
-  ENV 
