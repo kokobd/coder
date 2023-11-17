@@ -13,8 +13,8 @@ variable "container_resource" {
   nullable    = false
 }
 
-variable "coder_template_name" {
-  type        = string
-  description = "Name of the coder template within this repository. For example, 'docker' or 'ecs-ec2'"
-  nullable    = false
+variable "coder_region" {
+  type = string
+  description = "Region that the coder server runs in"
+  nullable = false
 }

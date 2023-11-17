@@ -49,7 +49,7 @@ module "common" {
   coder_provisioner   = data.coder_provisioner.me
   coder_workspace     = data.coder_workspace.me
   container_resource  = aws_ecs_service.main
-  coder_template_name = "ecs-ec2"
+  coder_region = "aws-${data.aws_region.current.name}"
 }
 
 

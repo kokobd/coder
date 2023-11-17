@@ -61,6 +61,15 @@ data "coder_parameter" "github_repo" {
   mutable      = false
 }
 
+data "coder_parameter" "user_secret" {
+  name = "user_secret"
+  display_name = "User Secret"
+  description = "A secret string for user-specific needs. Usually is a decryption key for all encrypted files in dotfiles"
+  mutable = falsea
+  default = ""
+  type = "string"
+}
+
 resource "coder_agent" "main" {
   arch                   = var.coder_provisioner.arch
   os                     = "linux"
@@ -69,7 +78,7 @@ resource "coder_agent" "main" {
     DOTFILES_URI      = data.coder_parameter.dotfiles_uri.value != "" ? data.coder_parameter.dotfiles_uri.value : null,
     GITHUB_REPOSITORY = data.coder_parameter.github_repo.value
     LC_ALL            = "C.utf8"
-    CODER_TEMPLATE    = var.coder_template_name
+    CODER_REGION      = var.coder_region
 
     # Redirect build cache of common compilers to /workspace
     XDG_CONFIG_HOME = "/workspace/.config"

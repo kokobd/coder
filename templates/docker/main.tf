@@ -24,7 +24,7 @@ module "common" {
   coder_provisioner   = data.coder_provisioner.me
   coder_workspace     = data.coder_workspace.me
   container_resource  = docker_container.workspace
-  coder_template_name = "docker"
+  coder_region = "home"
 }
 
 
