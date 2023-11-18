@@ -46,10 +46,10 @@ data "coder_parameter" "disk_size_gib" {
 module "common" {
   source = "./modules/common"
 
-  coder_provisioner   = data.coder_provisioner.me
-  coder_workspace     = data.coder_workspace.me
-  container_resource  = aws_ecs_service.main
-  coder_region = "aws-${data.aws_region.current.name}"
+  coder_provisioner  = data.coder_provisioner.me
+  coder_workspace    = data.coder_workspace.me
+  container_resource = aws_ecs_service.main
+  coder_region       = "aws-${data.aws_region.current.name}"
 }
 
 

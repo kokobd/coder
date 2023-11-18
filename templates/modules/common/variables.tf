@@ -14,7 +14,7 @@ variable "container_resource" {
 }
 
 variable "coder_region" {
-  type = string
+  type        = string
   description = "Region that the coder server runs in"
-  nullable = false
+  nullable    = false
 }

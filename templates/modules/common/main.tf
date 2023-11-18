@@ -62,12 +62,12 @@ data "coder_parameter" "github_repo" {
 }
 
 data "coder_parameter" "user_secret" {
-  name = "user_secret"
+  name         = "user_secret"
   display_name = "User Secret"
-  description = "A secret string for user-specific needs. Usually is a decryption key for all encrypted files in dotfiles"
-  mutable = falsea
-  default = ""
-  type = "string"
+  description  = "A secret string for user-specific needs. Usually is a decryption key for all encrypted files in dotfiles"
+  mutable      = falsea
+  default      = ""
+  type         = "string"
 }
 
 resource "coder_agent" "main" {
