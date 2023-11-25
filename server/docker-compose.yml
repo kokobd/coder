@@ -1,7 +1,7 @@
 version: "3.9"
 services:
   coder:
-    image: ghcr.io/coder/coder:v2.3.3
+    image: ghcr.io/coder/coder:v2.4.0
     user: root
     restart: unless-stopped
     ports:
@@ -19,6 +19,7 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - /etc/letsencrypt:/etc/letsencrypt:ro
+      - /root/.ssh:/root/.ssh:ro
     depends_on:
       database:
         condition: service_healthy

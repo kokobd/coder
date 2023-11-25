@@ -9,7 +9,25 @@ terraform {
   }
 }
 
+data "coder_parameter" "docker_engine_port" {
+  name         = "docker_engine_port"
+  display_name = "Docker Engine Port"
+  type         = "number"
+  default      = 2022
+  option {
+    name  = "AMD PC"
+    value = 2022
+  }
+  option {
+    name  = "NUC 11"
+    value = 2023
+  }
+  mutable = false
+}
+
 provider "docker" {
+  host     = "ssh://kokobd@172.17.0.1:${data.coder_parameter.docker_engine_port.value}"
+  ssh_opts = ["-o", "StrictHostKeyChecking=no", "-o", "UserKnownHostsFile=/dev/null"]
 }
 
 data "coder_provisioner" "me" {
@@ -58,7 +76,7 @@ resource "docker_container" "workspace" {
   networks_advanced {
     name = docker_network.bridge.id
   }
-  dns = ["172.17.0.1"]
+  dns = ["8.8.8.8"]
   # Add labels in Docker to keep track of orphan resources.
   labels {
     label = "coder.owner"

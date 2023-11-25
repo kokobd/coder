@@ -104,7 +104,7 @@ resource "aws_ecs_task_definition" "main" {
   ])
   network_mode             = "host"
   requires_compatibilities = ["EC2"]
-  memory                   = data.coder_parameter.memory_gib.value * 1024 - 700
+  memory                   = 1024
   volume {
     name = "workspace"
     efs_volume_configuration {
