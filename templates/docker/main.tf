@@ -11,7 +11,7 @@ terraform {
 
 data "coder_parameter" "docker_engine_port" {
   name         = "docker_engine_port"
-  display_name = "Docker Engine Port"
+  display_name = "Docker Engine"
   type         = "number"
   default      = 2022
   option {
